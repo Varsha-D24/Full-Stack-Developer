@@ -1,0 +1,29 @@
+Register Endpoint:
+Hash the password and save the user in the database.
+Return a success message or error.
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    hashed_password = generate_password_hash(data['password'])
+    user = User(username=data['username'], email=data['email'], password=hashed_password)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({"message": "User registered successfully!"})
+
+Login Endpoint: - Validate the user and issue a JWT token.
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = User.query.filter_by(username=data['username']).first()
+    if not user or not check_password_hash(user.password, data['password']):
+        return jsonify({"message": "Invalid credentials"}), 401
+    token = create_access_token(identity=user.id)
+    return jsonify({"token": token})
+
+Profile Endpoint: - Use the JWT token to verify the user and return their profile.
+@app.route('/profile', methods=['GET'])
+@jwt_required()
+def profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    return jsonify({"username": user.username, "email": user.email})
