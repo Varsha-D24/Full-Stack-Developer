@@ -1,0 +1,4 @@
+For Flask:
+pip install flask flask-jwt-extended flask_sqlalchemy
+For Node.js with Express:
+npm install express bcryptjs jsonwebtoken mongoose
